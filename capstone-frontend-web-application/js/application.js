@@ -1,4 +1,3 @@
-
 function showLoginForm()
 {
     templateBuilder.build('login-form', {}, 'login');
@@ -75,6 +74,60 @@ function clearCart()
 {
     cartService.clearCart();
     cartService.loadCartPage();
+}
+
+// ✅ NEW: Checkout function
+function checkout()
+{
+    if (!userService.isLoggedIn()) {
+        const data = { 
+            error: "Please log in to checkout." 
+        };
+        templateBuilder.append("error", data, "errors");
+        showLoginForm();
+        return;
+    }
+    
+    if (!cartService.cart.items || cartService.cart.items.length === 0) {
+        const data = { 
+            error: "Your cart is empty. Add some items before checkout." 
+        };
+        templateBuilder.append("error", data, "errors");
+        return;
+    }
+    
+    // Show loading state
+    const checkoutBtn = document.querySelector('.checkout-btn');
+    if (checkoutBtn) {
+        checkoutBtn.disabled = true;
+        checkoutBtn.textContent = 'Processing...';
+    }
+    
+    orderService.checkout()
+        .then(order => {
+            // Redirect to home after successful checkout
+            setTimeout(() => {
+                loadHome();
+            }, 2000);
+        })
+        .catch(error => {
+            // Re-enable button on error
+            if (checkoutBtn) {
+                checkoutBtn.disabled = false;
+                checkoutBtn.textContent = 'Checkout';
+            }
+        });
+}
+
+// ✅ NEW: Show order history
+function showOrderHistory()
+{
+    if (!userService.isLoggedIn()) {
+        showLoginForm();
+        return;
+    }
+    
+    orderService.loadOrderHistoryPage();
 }
 
 function setCategory(control)

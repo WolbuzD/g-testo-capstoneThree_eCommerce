@@ -1,0 +1,188 @@
+<div class="order-history-container">
+    <div class="page-header">
+        <h1>Order History</h1>
+        <p>Welcome back, {{username}}!</p>
+    </div>
+
+    {{#hasOrders}}
+    <div class="orders-list">
+        {{#orders}}
+        <div class="order-card">
+            <div class="order-header">
+                <div class="order-info">
+                    <h3>Order #{{orderId}}</h3>
+                    <p class="order-date">Placed on {{formattedDate}}</p>
+                </div>
+                <div class="order-status">
+                    <span class="badge badge-success">Completed</span>
+                </div>
+            </div>
+
+            <div class="order-details">
+                <div class="shipping-info">
+                    <h5>Shipping Address:</h5>
+                    <p>{{address}}<br>
+                        {{city}}, {{state}} {{zip}}
+                    </p>
+                </div>
+
+                {{#hasItems}}
+                <div class="order-items">
+                    <h5>Items ({{itemCount}}):</h5>
+                    <div class="items-list">
+                        {{#items}}
+                        <div class="order-item">
+                            <span class="item-name">Product ID: {{productId}}</span>
+                            <span class="item-quantity">Qty: {{quantity}}</span>
+                            <span class="item-price">${{salesPrice}}</span>
+                        </div>
+                        {{/items}}
+                    </div>
+                </div>
+                {{/hasItems}}
+
+                {{^hasItems}}
+                <div class="no-items">
+                    <p><em>No items found for this order</em></p>
+                </div>
+                {{/hasItems}}
+            </div>
+        </div>
+        {{/orders}}
+    </div>
+    {{/hasOrders}}
+
+    {{^hasOrders}}
+    <div class="no-orders">
+        <div class="text-center">
+            <h3>No Orders Yet</h3>
+            <p>You haven't placed any orders yet. Start shopping to see your order history here!</p>
+            <button class="btn btn-primary btn-lg" onclick="loadHome()">
+                Start Shopping
+            </button>
+        </div>
+    </div>
+    {{/hasOrders}}
+
+    <div class="back-to-shopping">
+        <button class="btn btn-secondary" onclick="loadHome()">
+            ← Continue Shopping
+        </button>
+    </div>
+</div>
+
+<style>
+    .order-history-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .page-header h1 {
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .order-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        padding: 20px;
+        background: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .order-info h3 {
+        margin: 0;
+        color: #2c5aa0;
+    }
+
+    .order-date {
+        margin: 5px 0 0 0;
+        color: #666;
+        font-size: 14px;
+    }
+
+    .badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .badge-success {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .order-details {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 20px;
+        margin-top: 15px;
+    }
+
+    .shipping-info h5,
+    .order-items h5 {
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .order-item:last-child {
+        border-bottom: none;
+    }
+
+    .item-price {
+        font-weight: bold;
+        color: #28a745;
+    }
+
+    .no-orders,
+    .no-items {
+        text-align: center;
+        padding: 40px 20px;
+        color: #666;
+    }
+
+    .back-to-shopping {
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    @media (max-width: 768px) {
+        .order-details {
+            grid-template-columns: 1fr;
+        }
+
+        .order-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .order-item {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>
