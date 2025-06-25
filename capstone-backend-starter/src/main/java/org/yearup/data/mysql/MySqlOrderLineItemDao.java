@@ -24,16 +24,22 @@ public class MySqlOrderLineItemDao extends MySqlDaoBase implements OrderLineItem
 
         try (Connection connection = getConnection())
         {
-            PreparedStatement ps = connection.prepareStatement(sql);
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, item.getOrderId());
             ps.setInt(2, item.getProductId());
             ps.setInt(3, item.getQuantity());
             ps.setBigDecimal(4, item.getUnitPrice());
-            ps.setBigDecimal(5, item.getSalesPrice()); // ✅ added
+            ps.setBigDecimal(5, item.getSalesPrice());
 
             System.out.println("Inserting line item: " + item.getProductId() + " x" + item.getQuantity() + " for orderId=" + item.getOrderId());
 
             ps.executeUpdate();
+
+            // Capture the generated primary key
+            ResultSet keys = ps.getGeneratedKeys();
+            if (keys.next()) {
+                item.setLineItemId(keys.getInt(1));
+            }
         }
         catch (SQLException e)
         {
@@ -57,12 +63,13 @@ public class MySqlOrderLineItemDao extends MySqlDaoBase implements OrderLineItem
             while (rs.next())
             {
                 OrderLineItem item = new OrderLineItem();
-                item.setLineItemId(rs.getInt("line_item_id"));
+                item.setLineItemId(rs.getInt("order_line_item_id"));
+
                 item.setOrderId(rs.getInt("order_id"));
                 item.setProductId(rs.getInt("product_id"));
                 item.setQuantity(rs.getInt("quantity"));
                 item.setUnitPrice(rs.getBigDecimal("unit_price"));
-                item.setSalesPrice(rs.getBigDecimal("sales_price")); // ✅ added
+                item.setSalesPrice(rs.getBigDecimal("sales_price"));
 
                 items.add(item);
             }
