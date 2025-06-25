@@ -1,9 +1,13 @@
 package org.yearup.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Order {
     private int orderId;
     private int userId;
@@ -14,6 +18,7 @@ public class Order {
     private String state;
     private String zip;
 
+    @JsonProperty("items")
     private List<OrderLineItem> items;
 
     public Order() {}
@@ -24,7 +29,6 @@ public class Order {
         this.totalAmount = totalAmount;
     }
 
-    // Getters and Setters
     public int getOrderId() { return orderId; }
     public void setOrderId(int orderId) { this.orderId = orderId; }
 
