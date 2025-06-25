@@ -9,19 +9,80 @@ class ShoppingCartService {
 
     addToCart(productId)
     {
+        // ✅ Check if user is logged in first
+        if (!userService.isLoggedIn()) {
+            const data = {
+                error: "Please log in to add items to cart."
+            };
+            templateBuilder.append("error", data, "errors");
+            showLoginForm();
+            return;
+        }
+
         const url = `${config.baseUrl}/cart/products/${productId}`;
 
-        axios.post(url, {})
+        console.log('🛒 Adding to cart:', {
+            productId,
+            url,
+            token: userService.currentUser.token ? 'Present' : 'Missing',
+            userLoggedIn: userService.isLoggedIn()
+        });
+
+        return axios.post(url, {})
             .then(response => {
-                this.setCart(response.data)
-                this.updateCartDisplay()
+                console.log('✅ Add to cart success:', response.data);
+                this.setCart(response.data);
+                this.updateCartDisplay();
+
+                // Show success message
+                const data = {
+                    message: "Product added to cart successfully!"
+                };
+                templateBuilder.append("message", data, "errors");
+
+                return response.data;
             })
             .catch(error => {
-                const data = {
-                    error: "Add to cart failed."
-                };
-                templateBuilder.append("error", data, "errors")
-            })
+                console.error('❌ Add to cart failed:', error);
+
+                let errorMessage = "Add to cart failed.";
+
+                if (error.response) {
+                    // Server responded with error status
+                    console.error('Server Error Details:', {
+                        status: error.response.status,
+                        data: error.response.data,
+                        headers: error.response.headers
+                    });
+
+                    switch (error.response.status) {
+                        case 401:
+                            errorMessage = "Please log in to add items to cart.";
+                            showLoginForm();
+                            break;
+                        case 404:
+                            errorMessage = "Product not found.";
+                            break;
+                        case 500:
+                            errorMessage = "Server error. Please try again later.";
+                            break;
+                        default:
+                            errorMessage = error.response.data?.message || "Add to cart failed.";
+                    }
+                } else if (error.request) {
+                    // Request was made but no response received
+                    console.error('Network Error - No Response:', error.request);
+                    errorMessage = "Cannot connect to server. Please check if the backend is running.";
+                } else {
+                    // Something else happened
+                    console.error('Request Setup Error:', error.message);
+                    errorMessage = "Request failed: " + error.message;
+                }
+
+                const data = { error: errorMessage };
+                templateBuilder.append("error", data, "errors");
+                throw error;
+            });
     }
 
     setCart(data)
@@ -40,19 +101,33 @@ class ShoppingCartService {
 
     loadCart()
     {
+        // Check if user is logged in
+        if (!userService.isLoggedIn()) {
+            console.log('ℹ️ User not logged in, skipping cart load');
+            return;
+        }
+
         const url = `${config.baseUrl}/cart`;
 
-        axios.get(url)
+        return axios.get(url)
             .then(response => {
-                this.setCart(response.data)
-                this.updateCartDisplay()
+                console.log('✅ Cart loaded:', response.data);
+                this.setCart(response.data);
+                this.updateCartDisplay();
+                return response.data;
             })
             .catch(error => {
-                const data = {
-                    error: "Load cart failed."
-                };
-                templateBuilder.append("error", data, "errors")
-            })
+                console.error('❌ Cart load failed:', error);
+
+                // Don't show error for unauthorized cart loads
+                if (error.response && error.response.status !== 401) {
+                    const data = {
+                        error: "Failed to load cart."
+                    };
+                    templateBuilder.append("error", data, "errors");
+                }
+                throw error;
+            });
     }
 
     loadCartPage()
@@ -84,7 +159,7 @@ class ShoppingCartService {
         clearButton.addEventListener("click", () => this.clearCart());
         buttonContainer.appendChild(clearButton);
 
-        // ✅ NEW: Add Checkout Button
+        // Add Checkout Button
         if (this.cart.items.length > 0) {
             const checkoutButton = document.createElement("button");
             checkoutButton.classList.add("btn", "btn-success", "btn-lg", "checkout-btn");
@@ -96,7 +171,7 @@ class ShoppingCartService {
         cartHeader.appendChild(buttonContainer);
         contentDiv.appendChild(cartHeader);
 
-        // ✅ NEW: Show total if items exist
+        // Show total if items exist
         if (this.cart.items.length > 0) {
             const totalDiv = document.createElement("div");
             totalDiv.classList.add("cart-total");
@@ -106,7 +181,7 @@ class ShoppingCartService {
 
         main.appendChild(contentDiv);
 
-        // ✅ NEW: Show empty cart message if no items
+        // Show empty cart message if no items
         if (this.cart.items.length === 0) {
             const emptyDiv = document.createElement("div");
             emptyDiv.classList.add("empty-cart");
@@ -159,7 +234,7 @@ class ShoppingCartService {
         quantityDiv.innerText = `Quantity: ${item.quantity}`;
         outerDiv.appendChild(quantityDiv)
 
-        // ✅ NEW: Add line total
+        // Add line total
         let lineTotalDiv = document.createElement("div");
         lineTotalDiv.classList.add("line-total");
         const lineTotal = item.product.price * item.quantity;
@@ -171,10 +246,19 @@ class ShoppingCartService {
 
     clearCart()
     {
+        if (!userService.isLoggedIn()) {
+            const data = {
+                error: "Please log in to clear cart."
+            };
+            templateBuilder.append("error", data, "errors");
+            return;
+        }
+
         const url = `${config.baseUrl}/cart`;
 
-        axios.delete(url)
+        return axios.delete(url)
              .then(response => {
+                 console.log('✅ Cart cleared:', response.data);
                  this.cart = {
                      items: [],
                      total: 0
@@ -188,13 +272,22 @@ class ShoppingCartService {
 
                  this.updateCartDisplay()
                  this.loadCartPage()
+
+                 const data = {
+                     message: "Cart cleared successfully!"
+                 };
+                 templateBuilder.append("message", data, "errors");
+
+                 return response.data;
              })
              .catch(error => {
+                 console.error('❌ Clear cart failed:', error);
                  const data = {
-                     error: "Empty cart failed."
+                     error: "Failed to clear cart."
                  };
-                 templateBuilder.append("error", data, "errors")
-             })
+                 templateBuilder.append("error", data, "errors");
+                 throw error;
+             });
     }
 
     updateCartDisplay()
@@ -216,7 +309,8 @@ class ShoppingCartService {
 document.addEventListener('DOMContentLoaded', () => {
     cartService = new ShoppingCartService();
 
-    if(userService.isLoggedIn())
+    // Only load cart if user is logged in
+    if(userService && userService.isLoggedIn())
     {
         cartService.loadCart();
     }
