@@ -31,14 +31,22 @@ class ShoppingCartService {
         return axios.post(url, {})
             .then(response => {
                 console.log('✅ Add to cart success:', response.data);
-                this.setCart(response.data);
-                this.updateCartDisplay();
 
-                // Show success message
-                const data = {
-                    message: "Product added to cart successfully!"
-                };
-                templateBuilder.append("message", data, "errors");
+                // Check if response.data exists before processing
+                if (response.data) {
+                    this.setCart(response.data);
+                    this.updateCartDisplay();
+
+                    // Show success message
+                    const data = {
+                        message: "Product added to cart successfully!"
+                    };
+                    templateBuilder.append("message", data, "errors");
+                } else {
+                    console.warn('⚠️ Empty response data from add to cart');
+                    // Still try to reload the cart
+                    this.loadCart();
+                }
 
                 return response.data;
             })
@@ -87,16 +95,30 @@ class ShoppingCartService {
 
     setCart(data)
     {
+        // Initialize cart with defaults
         this.cart = {
             items: [],
             total: 0
         }
 
-        this.cart.total = data.total;
+        // Safely set total
+        this.cart.total = data?.total || 0;
 
-        for (const [key, value] of Object.entries(data.items)) {
-            this.cart.items.push(value);
+        // Check if data.items exists and is not null/undefined
+        if (data && data.items) {
+            // Handle both array and object formats
+            if (Array.isArray(data.items)) {
+                // If items is already an array
+                this.cart.items = data.items;
+            } else {
+                // If items is an object, convert to array
+                for (const [key, value] of Object.entries(data.items)) {
+                    this.cart.items.push(value);
+                }
+            }
         }
+
+        console.log('✅ Cart set:', this.cart);
     }
 
     loadCart()
@@ -104,7 +126,7 @@ class ShoppingCartService {
         // Check if user is logged in
         if (!userService.isLoggedIn()) {
             console.log('ℹ️ User not logged in, skipping cart load');
-            return;
+            return Promise.resolve();
         }
 
         const url = `${config.baseUrl}/cart`;
@@ -251,7 +273,7 @@ class ShoppingCartService {
                 error: "Please log in to clear cart."
             };
             templateBuilder.append("error", data, "errors");
-            return;
+            return Promise.reject(new Error("User not logged in"));
         }
 
         const url = `${config.baseUrl}/cart`;
@@ -259,15 +281,16 @@ class ShoppingCartService {
         return axios.delete(url)
              .then(response => {
                  console.log('✅ Cart cleared:', response.data);
+
+                 // Reset cart to empty state
                  this.cart = {
                      items: [],
                      total: 0
                  }
 
-                 this.cart.total = response.data.total;
-
-                 for (const [key, value] of Object.entries(response.data.items)) {
-                     this.cart.items.push(value);
+                 // Set cart data from response if available
+                 if (response.data) {
+                     this.setCart(response.data);
                  }
 
                  this.updateCartDisplay()
@@ -302,6 +325,7 @@ class ShoppingCartService {
         }
         catch (e) {
             // Silently handle if cart display element doesn't exist
+            console.log('ℹ️ Cart display element not found (this is normal during page load)');
         }
     }
 }
