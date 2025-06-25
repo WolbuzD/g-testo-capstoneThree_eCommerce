@@ -14,6 +14,7 @@ import org.yearup.models.OrderLineItem;
 import org.yearup.models.ShoppingCart;
 import org.yearup.models.ShoppingCartItem;
 import org.yearup.models.User;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -38,6 +39,7 @@ public class OrdersController
     private UserDao userDao;
 
     @PostMapping
+    @Transactional
     public Order placeOrder(@RequestBody(required = false) Object unused,
                             java.security.Principal principal)
     {
