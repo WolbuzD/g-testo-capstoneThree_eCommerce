@@ -20,16 +20,17 @@ public class MySqlOrderLineItemDao extends MySqlDaoBase implements OrderLineItem
     @Override
     public void create(OrderLineItem item)
     {
-        String sql = "INSERT INTO order_line_items (order_id, product_id, quantity, unit_price, sales_price) VALUES (?, ?, ?, ?, ?)";
+        // Fixed SQL - match exact database schema (no unit_price column)
+        String sql = "INSERT INTO order_line_items (order_id, product_id, sales_price, quantity, discount) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection connection = getConnection())
         {
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, item.getOrderId());
             ps.setInt(2, item.getProductId());
-            ps.setInt(3, item.getQuantity());
-            ps.setBigDecimal(4, item.getUnitPrice());
-            ps.setBigDecimal(5, item.getSalesPrice());
+            ps.setBigDecimal(3, item.getSalesPrice()); // Use salesPrice for sales_price column
+            ps.setInt(4, item.getQuantity());
+            ps.setBigDecimal(5, java.math.BigDecimal.ZERO); // discount
 
             System.out.println("Inserting line item: " + item.getProductId() + " x" + item.getQuantity() + " for orderId=" + item.getOrderId());
 
@@ -64,12 +65,12 @@ public class MySqlOrderLineItemDao extends MySqlDaoBase implements OrderLineItem
             {
                 OrderLineItem item = new OrderLineItem();
                 item.setLineItemId(rs.getInt("order_line_item_id"));
-
                 item.setOrderId(rs.getInt("order_id"));
                 item.setProductId(rs.getInt("product_id"));
                 item.setQuantity(rs.getInt("quantity"));
-                item.setUnitPrice(rs.getBigDecimal("unit_price"));
                 item.setSalesPrice(rs.getBigDecimal("sales_price"));
+                // Set unitPrice to same as salesPrice since unit_price column doesn't exist
+                item.setUnitPrice(rs.getBigDecimal("sales_price"));
 
                 items.add(item);
             }

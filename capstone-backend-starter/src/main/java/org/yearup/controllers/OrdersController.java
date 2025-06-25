@@ -74,12 +74,15 @@ public class OrdersController
                         order.getOrderId(),
                         item.getProductId(),
                         item.getQuantity(),
-                        unitPrice,
+                        salesPricePerUnit,    // Use salesPrice for both
                         salesPricePerUnit
                 );
 
                 orderLineItemDao.create(line);
             }
+
+            // Clear the shopping cart after successful order creation
+            shoppingCartDao.clear(userId);
 
             return order;
         }
