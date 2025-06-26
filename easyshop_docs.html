@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EasyShop E-Commerce API</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.7;
+            color: #1a1a1a;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            color: white;
+            padding: 3rem 3rem 2rem;
+            text-align: center;
+        }
+
+        .content {
+            padding: 3rem;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin: 3rem 0 1.5rem 0;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #4a5568;
+            margin: 2rem 0 1rem 0;
+        }
+
+        h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin: 1.5rem 0 0.75rem 0;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            color: #4a5568;
+            font-size: 1.05rem;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+
+        /* Code blocks */
+        pre, code {
+            font-family: 'JetBrains Mono', Monaco, 'Cascadia Code', monospace;
+            background: #1a202c;
+            color: #e2e8f0;
+            border-radius: 8px;
+        }
+
+        pre {
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            border-left: 4px solid #667eea;
+        }
+
+        code {
+            padding: 0.2rem 0.4rem;
+            font-size: 0.9em;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            margin: 2rem 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            min-width: 900px;
+            border-collapse: collapse;
+            background: white;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        th:first-child {
+            border-radius: 12px 0 0 0;
+        }
+
+        th:last-child {
+            border-radius: 0 12px 0 0;
+        }
+
+        td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            color: #4a5568;
+        }
+
+        tr:hover {
+            background-color: #f7fafc;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 1.5rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.75rem;
+            color: #4a5568;
+        }
+
+        li strong {
+            color: #2d3748;
+        }
+
+        /* Blockquotes */
+        blockquote {
+            border-left: 4px solid #667eea;
+            background: #f7fafc;
+            padding: 1rem 2rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: #4a5568;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Feature cards */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: #f7fafc;
+            padding: 2rem;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .feature-card h4 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .header, .content {
+                padding: 2rem 1.5rem;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            h2 {
+                font-size: 1.75rem;
+            }
+
+            table {
+                min-width: 700px;
+            }
+
+            th, td {
+                padding: 0.75rem 1rem;
+            }
+        }
+
+        /* Highlight boxes */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .highlight-box h3 {
+            color: #667eea;
+            margin-top: 0;
+        }
+
+        /* Links */
+        a {
+            color: #667eea;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s ease;
+        }
+
+        a:hover {
+            border-bottom-color: #667eea;
+        }
+
+        /* Architecture tree */
+        .arch-tree {
+            font-family: 'JetBrains Mono', monospace;
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>EasyShop E-Commerce API</h1>
+            <p class="subtitle">A comprehensive Spring Boot REST API for an e-commerce platform supporting user management, product catalog, shopping cart, and order processing.</p>
+        </div>
+
+        <div class="content">
+            <h2>📸 Application Screenshots</h2>
+            
+            <h3>Home Page</h3>
+            <p><img src="screenshots/homepage.png" alt="EasyShop Home Page"><br>
+            <em>The main product catalog showing featured items and category navigation</em></p>
+
+            <h3>Shopping Cart</h3>
+            <p><img src="screenshots/cart-view.png" alt="Shopping Cart View"><br>
+            <em>User's shopping cart with product details, quantities, and checkout options</em></p>
+
+            <h2>🚀 Features</h2>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Core Functionality</h4>
+                    <ul>
+                        <li><strong>User Authentication & Authorization</strong> (JWT-based)</li>
+                        <li><strong>Product Management</strong> (CRUD operations)</li>
+                        <li><strong>Category Management</strong> (CRUD operations)</li>
+                        <li><strong>Shopping Cart</strong> (Persistent, user-specific)</li>
+                        <li><strong>Order Processing</strong> (Checkout functionality)</li>
+                        <li><strong>User Profiles</strong> (Account management)</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h4>Security Features</h4>
+                    <ul>
+                        <li>Role-based access control (USER/ADMIN)</li>
+                        <li>JWT token authentication</li>
+                        <li>Password encryption (BCrypt)</li>
+                        <li>Protected admin-only endpoints</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h4>Database Features</h4>
+                    <ul>
+                        <li>MySQL database integration</li>
+                        <li>Foreign key constraints</li>
+                        <li>Transaction management</li>
+                        <li>Data validation</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h2>🛠️ Technology Stack</h2>
+            <p>
+                <span class="badge">Spring Boot 2.7.3</span>
+                <span class="badge">Spring Security + JWT</span>
+                <span class="badge">MySQL 8.0</span>
+                <span class="badge">Spring JDBC</span>
+                <span class="badge">Maven</span>
+                <span class="badge">Java 17</span>
+            </p>
+
+            <h2>📋 Prerequisites</h2>
+            <ul>
+                <li>Java 17 or higher</li>
+                <li>Maven 3.6+</li>
+                <li>MySQL 8.0+</li>
+                <li>IDE (IntelliJ IDEA recommended)</li>
+            </ul>
+
+            <h2>⚙️ Setup Instructions</h2>
+
+            <h3>1. Clone the Repository</h3>
+            <pre><code>git clone https://github.com/yourusername/easyshop-api.git
+cd easyshop-api</code></pre>
+
+            <h3>2. Database Setup</h3>
+            <pre><code>-- Run the database creation script
+USE sys;
+SOURCE /path/to/database/create_database.sql;</code></pre>
+
+            <h3>3. Application Configuration</h3>
+            <p>Update <code>src/main/resources/application.properties</code>:</p>
+            <pre><code>datasource.url=jdbc:mysql://localhost:3306/easyshop
+datasource.username=your_username
+datasource.password=your_password</code></pre>
+
+            <h3>4. Build and Run</h3>
+            <pre><code># Build the project
+mvn clean install
+
+# Run the application
+mvn spring-boot:run</code></pre>
+
+            <p>The API will be available at: <code>http://localhost:8080</code></p>
+
+            <h2>🔧 API Documentation</h2>
+
+            <h3>Authentication Endpoints</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Description</th>
+                            <th>Access</th>
+                            <th>Request Body</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>POST</td>
+                            <td>/register</td>
+                            <td>User registration</td>
+                            <td>Public</td>
+                            <td>{username, password, confirmPassword, role}</td>
+                        </tr>
+                        <tr>
+                            <td>POST</td>
+                            <td>/login</td>
+                            <td>User login</td>
+                            <td>Public</td>
+                            <td>{username, password}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Category Management</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Description</th>
+                            <th>Access</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>GET</td>
+                            <td>/categories</td>
+                            <td>Get all categories</td>
+                            <td>Public</td>
+                        </tr>
+                        <tr>
+                            <td>GET</td>
+                            <td>/categories/{id}</td>
+                            <td>Get category by ID</td>
+                            <td>Public</td>
+                        </tr>
+                        <tr>
+                            <td>GET</td>
+                            <td>/categories/{id}/products</td>
+                            <td>Get products in category</td>
+                            <td>Public</td>
+                        </tr>
+                        <tr>
+                            <td>POST</td>
+                            <td>/categories</td>
+                            <td>Create new category</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td>PUT</td>
+                            <td>/categories/{id}</td>
+                            <td>Update existing category</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td>DELETE</td>
+                            <td>/categories/{id}</td>
+                            <td>Delete category</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Product Management</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Description</th>
+                            <th>Access</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>GET</td>
+                            <td>/products</td>
+                            <td>Search/filter products</td>
+                            <td>Public</td>
+                        </tr>
+                        <tr>
+                            <td>GET</td>
+                            <td>/products/{id}</td>
+                            <td>Get product by ID</td>
+                            <td>Public</td>
+                        </tr>
+                        <tr>
+                            <td>POST</td>
+                            <td>/products</td>
+                            <td>Create new product</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td>PUT</td>
+                            <td>/products/{id}</td>
+                            <td>Update existing product</td>
+                            <td>Admin</td>
+                        </tr>
+                        <tr>
+                            <td>DELETE</td>
+                            <td>/products/{id}</td>
+                            <td>Delete product</td>
+                            <td>Admin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Shopping Cart Operations</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Description</th>
+                            <th>Access</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>GET</td>
+                            <td>/cart</td>
+                            <td>Get user's cart items</td>
+                            <td>User</td>
+                        </tr>
+                        <tr>
+                            <td>POST</td>
+                            <td>/cart/products/{id}</td>
+                            <td>Add product to cart</td>
+                            <td>User</td>
+                        </tr>
+                        <tr>
+                            <td>PUT</td>
+                            <td>/cart/products/{id}</td>
+                            <td>Update cart item quantity</td>
+                            <td>User</td>
+                        </tr>
+                        <tr>
+                            <td>DELETE</td>
+                            <td>/cart</td>
+                            <td>Clear entire cart</td>
+                            <td>User</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Order Management</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Description</th>
+                            <th>Access</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>POST</td>
+                            <td>/orders</td>
+                            <td>Create order (checkout)</td>
+                            <td>User</td>
+                        </tr>
+                        <tr>
+                            <td>GET</td>
+                            <td>/orders</td>
+                            <td>Get user's order history</td>
+                            <td>User</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>User Profile</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Description</th>
+                            <th>Access</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>GET</td>
+                            <td>/profile</td>
+                            <td>Get user profile</td>
+                            <td>User</td>
+                        </tr>
+                        <tr>
+                            <td>PUT</td>
+                            <td>/profile</td>
+                            <td>Update user profile</td>
+                            <td>User</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>🔍 Advanced Search & Filtering</h2>
+
+            <h3>Product Search Parameters</h3>
+            <pre><code>GET /products?cat=1&minPrice=25&maxPrice=100&color=Black</code></pre>
+
+            <h4>Available Parameters:</h4>
+            <ul>
+                <li><code>cat</code> - Filter by category ID</li>
+                <li><code>minPrice</code> - Minimum price threshold</li>
+                <li><code>maxPrice</code> - Maximum price threshold</li>
+                <li><code>color</code> - Filter by product color</li>
+            </ul>
+
+            <h4>Example Requests:</h4>
+            <pre><code># Get all electronics under $500
+GET /products?cat=1&maxPrice=500
+
+# Get red products between $20-$100
+GET /products?color=Red&minPrice=20&maxPrice=100</code></pre>
+
+            <h2>🧪 Testing & Development</h2>
+
+            <h3>Pre-configured Test Users</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Password</th>
+                            <th>Role</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>admin</td>
+                            <td>password</td>
+                            <td>ADMIN</td>
+                            <td>Full system access</td>
+                        </tr>
+                        <tr>
+                            <td>user</td>
+                            <td>password</td>
+                            <td>USER</td>
+                            <td>Standard user privileges</td>
+                        </tr>
+                        <tr>
+                            <td>george</td>
+                            <td>password</td>
+                            <td>USER</td>
+                            <td>Sample customer account</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Quick Start with cURL</h3>
+
+            <h4>1. Register a New User</h4>
+            <pre><code>curl -X POST http://localhost:8080/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "newuser",
+    "password": "password123",
+    "confirmPassword": "password123",
+    "role": "USER"
+  }'</code></pre>
+
+            <h4>2. Login and Get JWT Token</h4>
+            <pre><code>curl -X POST http://localhost:8080/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "admin",
+    "password": "password"
+  }'</code></pre>
+
+            <h4>3. Access Protected Endpoints</h4>
+            <pre><code># Get user's cart (requires JWT token)
+curl -X GET http://localhost:8080/cart \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"</code></pre>
+
+            <h2>🐛 Key Bug Fixes & Improvements</h2>
+
+            <div class="highlight-box">
+                <h3>1. Product Search Enhancement</h3>
+                <p><strong>Issue:</strong> Search functionality returned inconsistent results</p>
+                <p><strong>Solution:</strong> Implemented robust SQL query building with proper parameter validation</p>
+                <p><strong>Impact:</strong> 100% accurate search results across all filter combinations</p>
+            </div>
+
+            <div class="highlight-box">
+                <h3>2. Product Update Fix</h3>
+                <p><strong>Issue:</strong> Updates created duplicate records instead of modifying existing ones</p>
+                <p><strong>Solution:</strong> Refactored <code>MySqlProductDao.update()</code> with proper WHERE clause implementation</p>
+                <p><strong>Impact:</strong> Eliminated data integrity issues and duplicate entries</p>
+            </div>
+
+            <div class="highlight-box">
+                <h3>3. Category Deletion Safety</h3>
+                <p><strong>Issue:</strong> Foreign key constraint violations when deleting categories containing products</p>
+                <p><strong>Solution:</strong> Added pre-deletion validation with informative error messages</p>
+                <p><strong>Impact:</strong> Prevented database corruption and improved user experience</p>
+            </div>
+
+            <h2>💡 Code Highlight: Smart Cart Management</h2>
+
+            <pre><code>@Override
+public void addProduct(int userId, int productId) {
+    String selectSql = "SELECT quantity FROM shopping_cart WHERE user_id = ? AND product_id = ?";
+    String insertSql = "INSERT INTO shopping_cart (user_id, product_id, quantity) VALUES (?, ?, 1)";
+    String updateSql = "UPDATE shopping_cart SET quantity = quantity + 1 WHERE user_id = ? AND product_id = ?";
+
+    try (Connection connection = getConnection()) {
+        PreparedStatement select = connection.prepareStatement(selectSql);
+        select.setInt(1, userId);
+        select.setInt(2, productId);
+        ResultSet result = select.executeQuery();
+
+        if (result.next()) {
+            // Product exists - increment quantity
+            PreparedStatement update = connection.prepareStatement(updateSql);
+            update.setInt(1, userId);
+            update.setInt(2, productId);
+            update.executeUpdate();
+        } else {
+            // New product - add to cart
+            PreparedStatement insert = connection.prepareStatement(insertSql);
+            insert.setInt(1, userId);
+            insert.setInt(2, productId);
+            insert.executeUpdate();
+        }
+    }
+}</code></pre>
+
+            <p>This intelligent cart management automatically handles quantity updates for existing items while seamlessly adding new products.</p>
+
+            <h2>📁 Project Architecture</h2>
+
+            <div class="arch-tree">
+src/
+├── main/
+│   ├── java/org/yearup/
+│   │   ├── controllers/        # REST API endpoints
+│   │   │   ├── AuthenticationController.java
+│   │   │   ├── CategoriesController.java
+│   │   │   ├── ProductsController.java
+│   │   │   └── ShoppingCartController.java
+│   │   ├── data/              # Data access layer
+│   │   │   ├── mysql/         # MySQL implementations
+│   │   │   └── interfaces/    # DAO interfaces
+│   │   ├── models/            # Entity classes
+│   │   │   ├── Category.java
+│   │   │   ├── Product.java
+│   │   │   ├── User.java
+│   │   │   └── ShoppingCartItem.java
+│   │   ├── security/          # Security configuration
+│   │   └── configurations/    # Spring configurations
+│   └── resources/
+│       ├── application.properties
+│       └── banner.txt
+├── test/
+│   └── java/org/yearup/data/mysql/    # Unit tests
+└── database/
+    └── create_database.sql            # Database setup script
+            </div>
+
+            <h2>🚀 Future Roadmap</h2>
+
+            <h3>Phase 1 - Enhanced Features</h3>
+            <ul>
+                <li>☐ Product reviews and ratings system</li>
+                <li>☐ Advanced inventory management</li>
+                <li>☐ Order status tracking</li>
+                <li>☐ Email notification system</li>
+            </ul>
+
+            <h3>Phase 2 - User Experience</h3>
+            <ul>
+                <li>☐ Product recommendation engine</li>
+                <li>☐ Search autocomplete functionality</li>
+                <li>☐ Wishlist management</li>
+                <li>☐ Mobile-responsive design</li>
+            </ul>
+
+            <h3>Phase 3 - Business Features</h3>
+            <ul>
+                <li>☐ Payment gateway integration</li>
+                <li>☐ Admin analytics dashboard</li>
+                <li>☐ Promotional codes/discounts</li>
+                <li>☐ Multi-vendor support</li>
+            </ul>
+
+            <h2>🤝 Contributing</h2>
+            <ol>
+                <li>Fork the repository</li>
+                <li>Create a feature branch (<code>git checkout -b feature/amazing-feature</code>)</li>
+                <li>Commit your changes (<code>git commit -m 'Add amazing feature'</code>)</li>
+                <li>Push to the branch (<code>git push origin feature/amazing-feature</code>)</li>
+                <li>Open a Pull Request</li>
+            </ol>
+
+            <h2>📝 License</h2>
+            <p>This project is developed as part of a Java Development Bootcamp capstone assignment.</p>
+
+            <h2>👨‍💻 About</h2>
+            <p><strong>Developer:</strong> [Your Name]<br>
+               <strong>Course:</strong> Java Development Bootcamp<br>
+               <strong>Project:</strong> Capstone 3 - E-Commerce API<br>
+               <strong>Institution:</strong> Year Up</p>
+
+            <hr style="margin: 3rem 0; border: none; height: 1px; background: linear-gradient(135deg, #667eea, #764ba2);">
+
+            <p style="text-align: center; font-size: 1.2rem; color: #667eea;">
+                ⭐ <strong>If you found this project helpful, please consider giving it a star!</strong>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
