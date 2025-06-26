@@ -24,4 +24,4 @@
 ## 🚀 Features
 [Uploading easyshop_docs.html…]()
 
- [View the styled HTML version](docs/readme.html)
+ [View the styled HTML version](easyshop_docs.html)
